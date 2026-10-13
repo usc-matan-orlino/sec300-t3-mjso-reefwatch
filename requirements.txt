@@ -1,0 +1,4 @@
+flask
+azure-cosmos
+pymssql
+python-dotenv
