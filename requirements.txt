@@ -1,4 +1,4 @@
 flask
-azure-cosmos
+pymongo
 pymssql
 python-dotenv

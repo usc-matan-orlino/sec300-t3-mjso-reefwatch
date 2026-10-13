@@ -1,23 +1,18 @@
-"""Database connections for ReefWatch (Cosmos DB and Azure SQL)."""
+"""Database connections for ReefWatch (Cosmos DB for MongoDB and Azure SQL)."""
 
 import os
 
 import pymssql
-from azure.cosmos import CosmosClient
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 load_dotenv()  # read settings from the .env file
 
 
-def get_cosmos_database():
-    """Return the Cosmos DB database object."""
-    client = CosmosClient(os.getenv("COSMOS_ENDPOINT"), os.getenv("COSMOS_KEY"))
-    return client.get_database_client(os.getenv("COSMOS_DATABASE"))
-
-
-def get_container(name):
-    """Return a Cosmos container: 'surveys', 'equipment' or 'partners'."""
-    return get_cosmos_database().get_container_client(name)
+def get_collection(name):
+    """Return a Mongo collection: 'surveys', 'equipment' or 'partners'."""
+    client = MongoClient(os.getenv("COSMOS_CONNECTION_STRING"))
+    return client[os.getenv("COSMOS_DATABASE")][name]
 
 
 def get_sql_connection():
@@ -32,9 +27,8 @@ def get_sql_connection():
 
 if __name__ == "__main__":
     # Quick check that both connections work.
-    for container_name in ("surveys", "equipment", "partners"):
-        get_container(container_name).read()
-        print(f"Cosmos container '{container_name}' OK")
+    for name in ("surveys", "equipment", "partners"):
+        print(f"Cosmos collection '{name}': {get_collection(name).count_documents({})} documents")
 
     conn = get_sql_connection()
     conn.close()
