@@ -1,6 +1,50 @@
 {% extends "base.html" %}
 {% block title %}New Survey - ReefWatch{% endblock %}
 {% block content %}
-<h1>New Survey</h1>
-<p>Survey entry form goes here.</p>
+<div class="page-header">
+    <h1>New Survey</h1>
+    <a class="button" href="{{ url_for('surveys') }}">Back</a>
+</div>
+
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
+
+<form class="side-form" method="post">
+    <label>Survey Date
+        <input type="date" name="survey_date" value="{{ form.get('survey_date', today) }}" required>
+    </label>
+    <label>Researcher Name
+        <input type="text" name="researcher_name" value="{{ form.get('researcher_name', '') }}" required>
+    </label>
+    <label>Researcher Email
+        <input type="email" name="researcher_email" value="{{ form.get('researcher_email', '') }}" required>
+    </label>
+    <label>Species Observed (comma separated)
+        <input type="text" name="species" value="{{ form.get('species', '') }}" required>
+    </label>
+    <label>Survey Cost ($)
+        <input type="number" name="survey_cost" step="0.01" min="0"
+               value="{{ form.get('survey_cost', '') }}" required>
+    </label>
+
+    <h2>Equipment Used</h2>
+    <table>
+        <tr><th>Equipment</th><th>Available</th><th>Quantity Used</th></tr>
+        {% for item in equipment_items %}
+        <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.available_quantity }}</td>
+            <td>
+                <input type="number" name="qty_{{ item._id }}" min="0"
+                       value="{{ form.get('qty_' ~ item._id, 0) }}">
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3">No equipment yet.</td></tr>
+        {% endfor %}
+    </table>
+
+    <button type="submit">Save</button>
+</form>
 {% endblock %}

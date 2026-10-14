@@ -1,7 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Surveys - ReefWatch{% endblock %}
 {% block content %}
-<h1>Surveys</h1>
-<p><a href="{{ url_for('new_survey') }}">Add new survey</a></p>
-<p>Survey list goes here.</p>
+<div class="page-header">
+    <h1>Surveys</h1>
+    <a class="button" href="{{ url_for('new_survey') }}">Add</a>
+</div>
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Researcher</th>
+        <th>Species Observed</th>
+        <th>Equipment Used</th>
+        <th>Cost</th>
+    </tr>
+    {% for survey in items %}
+    <tr>
+        <td>{{ survey.survey_date }}</td>
+        <td>{{ survey.researcher.name }} ({{ survey.researcher.email }})</td>
+        <td>{{ survey.species_observed | join(", ") }}</td>
+        <td>
+            {% for used in survey.equipment_used %}
+                {{ used.name }} x{{ used.quantity }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </td>
+        <td>${{ "%.2f"|format(survey.survey_cost) }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No surveys yet.</td></tr>
+    {% endfor %}
+</table>
 {% endblock %}
