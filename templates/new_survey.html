@@ -30,21 +30,99 @@
 
     <h2>Equipment Used</h2>
     <table>
-        <tr><th>Equipment</th><th>Available</th><th>Quantity Used</th></tr>
-        {% for item in equipment_items %}
-        <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.available_quantity }}</td>
-            <td>
-                <input type="number" name="qty_{{ item._id }}" min="0"
-                       value="{{ form.get('qty_' ~ item._id, 0) }}">
-            </td>
-        </tr>
-        {% else %}
-        <tr><td colspan="3">No equipment yet.</td></tr>
-        {% endfor %}
+        <thead>
+            <tr><th>Equipment</th><th>Quantity Used</th><th></th></tr>
+        </thead>
+        <tbody id="used-body"></tbody>
     </table>
+    <div>
+        <button type="button" id="open-picker">Add Equipment</button>
+    </div>
+
+    <!-- Equipment picker: the quantity boxes are submitted with the form. -->
+    <div id="picker" class="picker" hidden>
+        <table>
+            <tr><th>Equipment</th><th>Available</th><th>Quantity Used</th></tr>
+            {% for item in equipment_items %}
+            <tr data-name="{{ item.name }}" data-available="{{ item.available_quantity }}">
+                <td>{{ item.name }}</td>
+                <td>{{ item.available_quantity }}</td>
+                <td>
+                    <input type="number" name="qty_{{ item._id }}" min="0"
+                           value="{{ form.get('qty_' ~ item._id, 0) }}">
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3">No equipment yet.</td></tr>
+            {% endfor %}
+        </table>
+        <button type="button" id="add-selected">Add Selected</button>
+    </div>
 
     <button type="submit">Save</button>
 </form>
+
+<script>
+    var picker = document.getElementById("picker");
+    var usedBody = document.getElementById("used-body");
+
+    // Rebuild the "Equipment Used" table from the quantity boxes in the picker.
+    function showUsed() {
+        usedBody.innerHTML = "";
+        var count = 0;
+
+        picker.querySelectorAll("tr[data-name]").forEach(function (row) {
+            var input = row.querySelector("input");
+            var quantity = parseInt(input.value || "0", 10);
+            if (quantity <= 0) {
+                return;
+            }
+            count++;
+
+            var tr = document.createElement("tr");
+            var nameCell = document.createElement("td");
+            nameCell.textContent = row.dataset.name;
+            var quantityCell = document.createElement("td");
+            quantityCell.textContent = quantity;
+            var removeCell = document.createElement("td");
+            var removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.textContent = "Remove";
+            removeButton.onclick = function () {
+                input.value = 0;
+                showUsed();
+            };
+            removeCell.appendChild(removeButton);
+
+            tr.appendChild(nameCell);
+            tr.appendChild(quantityCell);
+            tr.appendChild(removeCell);
+            usedBody.appendChild(tr);
+        });
+
+        if (count === 0) {
+            usedBody.innerHTML = '<tr><td colspan="3">No equipment selected.</td></tr>';
+        }
+    }
+
+    document.getElementById("open-picker").onclick = function () {
+        picker.hidden = false;
+    };
+
+    document.getElementById("add-selected").onclick = function () {
+        var rows = picker.querySelectorAll("tr[data-name]");
+        for (var i = 0; i < rows.length; i++) {
+            var quantity = parseInt(rows[i].querySelector("input").value || "0", 10);
+            if (quantity > parseInt(rows[i].dataset.available, 10)) {
+                alert("Not enough " + rows[i].dataset.name + ": only " +
+                      rows[i].dataset.available + " available.");
+                return;
+            }
+        }
+        picker.hidden = true;
+        showUsed();
+    };
+
+    showUsed();
+</script>
 {% endblock %}
