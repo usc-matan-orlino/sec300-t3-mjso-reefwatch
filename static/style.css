@@ -25,6 +25,7 @@ tr.selected td { background: #dff0f7; }
 .side-form button { align-self: flex-end; }
 
 .error { color: #b00020; font-weight: bold; }
+.success { color: #1b7a3a; font-weight: bold; }
 
 .picker { border: 1px solid #ccc; padding: 10px; }
 .picker button { margin-top: 10px; }

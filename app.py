@@ -3,12 +3,14 @@
 Cosmos collections: surveys, equipment, partners.
 """
 
+import os
 from datetime import date
 
 from bson import ObjectId
 from flask import Flask, redirect, render_template, request, url_for
 
 from db import get_collection
+from summary import generate_summary, get_summaries, start_scheduler
 
 app = Flask(__name__)
 
@@ -160,9 +162,16 @@ def delete_partner():
     return redirect(url_for("partners"))
 
 
-@app.route("/summaries")
+@app.route("/summaries", methods=["GET", "POST"])
 def summaries():
-    return render_template("summaries.html")
+    """List stored daily summaries. POST generates the summary for a date."""
+    message = None
+    success = False
+    if request.method == "POST":
+        success, message = generate_summary(request.form["summary_date"])
+
+    return render_template("summaries.html", items=get_summaries(), message=message,
+                           success=success, today=date.today().isoformat())
 
 
 @app.route("/dashboard")
@@ -171,4 +180,8 @@ def dashboard():
 
 
 if __name__ == "__main__":
+    # The debug reloader runs this file twice; only start the scheduler in the
+    # process that serves requests, so the summary is not generated twice.
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        start_scheduler()
     app.run(debug=True)

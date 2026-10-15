@@ -1,6 +1,36 @@
 {% extends "base.html" %}
 {% block title %}Daily Summaries - ReefWatch{% endblock %}
 {% block content %}
-<h1>Daily Summaries</h1>
-<p>Generate button and summary list go here.</p>
+<div class="page-header">
+    <h1>Daily Summaries</h1>
+    <form method="post">
+        <input type="date" name="summary_date" value="{{ today }}" required>
+        <button type="submit">Generate Summary</button>
+    </form>
+</div>
+
+{% if message %}
+<p class="{{ 'success' if success else 'error' }}">{{ message }}</p>
+{% endif %}
+
+<table>
+    <tr>
+        <th>Date</th>
+        <th>Total Surveys</th>
+        <th>Total Cost</th>
+        <th>Most Observed Species</th>
+        <th>Low Equipment Alerts</th>
+    </tr>
+    {% for row in items %}
+    <tr>
+        <td>{{ row.summary_date }}</td>
+        <td>{{ row.total_surveys }}</td>
+        <td>${{ "%.2f"|format(row.total_survey_cost) }}</td>
+        <td>{{ row.top_species or "-" }}</td>
+        <td>{{ row.low_equipment_alerts or "-" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No summaries yet.</td></tr>
+    {% endfor %}
+</table>
 {% endblock %}
