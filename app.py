@@ -4,7 +4,7 @@ Cosmos collections: surveys, equipment, partners.
 """
 
 import os
-from datetime import date
+from datetime import date, timedelta
 
 from bson import ObjectId
 from flask import Flask, redirect, render_template, request, url_for
@@ -176,7 +176,46 @@ def summaries():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+    """Today's totals and this week's daily charts. Totals come from a Cosmos DB aggregation."""
+    surveys_collection = get_collection("surveys")
+
+    # Surveys and cost per day, calculated by Cosmos DB.
+    all_days = list(surveys_collection.aggregate([
+        {"$group": {"_id": "$survey_date", "surveys": {"$sum": 1},
+                    "cost": {"$sum": "$survey_cost"}}},
+    ]))
+
+    # Today's totals for the two tiles.
+    today = next((row for row in all_days if row["_id"] == date.today().isoformat()), None)
+    today_surveys = today["surveys"] if today else 0
+    today_cost = today["cost"] if today else 0
+    # Show large amounts in short form, e.g. $32.4k.
+    if today_cost >= 1000:
+        today_cost_text = f"${today_cost / 1000:.1f}k"
+    else:
+        today_cost_text = f"${today_cost:.2f}"
+
+    # One bar for each day of the current week (Monday to Sunday).
+    totals_by_date = {row["_id"]: row for row in all_days}
+    monday = date.today() - timedelta(days=date.today().weekday())
+    week_days = [monday + timedelta(days=i) for i in range(7)]
+
+    week_labels = [f"{day.day:02d}/{day.month:02d}" for day in week_days]
+    week_survey_counts = []
+    week_costs = []
+    for day in week_days:
+        row = totals_by_date.get(day.isoformat())
+        week_survey_counts.append(row["surveys"] if row else 0)
+        week_costs.append(round(row["cost"], 2) if row else 0)
+
+    return render_template(
+        "dashboard.html",
+        today_surveys=today_surveys,
+        today_cost_text=today_cost_text,
+        week_labels=week_labels,
+        week_survey_counts=week_survey_counts,
+        week_costs=week_costs,
+    )
 
 
 if __name__ == "__main__":

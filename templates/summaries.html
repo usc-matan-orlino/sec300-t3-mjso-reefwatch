@@ -1,36 +1,44 @@
 {% extends "base.html" %}
 {% block title %}Daily Summaries - ReefWatch{% endblock %}
 {% block content %}
-<div class="page-header">
-    <h1>Daily Summaries</h1>
-    <form method="post">
-        <input type="date" name="summary_date" value="{{ today }}" required>
-        <button type="submit">Generate Summary</button>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <h1 class="mb-0">Daily Summaries</h1>
+    <form method="post" class="d-flex gap-2">
+        <input class="form-control" type="date" name="summary_date" value="{{ today }}" required>
+        <button type="submit" class="btn btn-primary text-nowrap">Generate Summary</button>
     </form>
 </div>
 
 {% if message %}
-<p class="{{ 'success' if success else 'error' }}">{{ message }}</p>
+<div class="alert {{ 'alert-success' if success else 'alert-danger' }}">{{ message }}</div>
 {% endif %}
 
-<table>
-    <tr>
-        <th>Date</th>
-        <th>Total Surveys</th>
-        <th>Total Cost</th>
-        <th>Most Observed Species</th>
-        <th>Low Equipment Alerts</th>
-    </tr>
-    {% for row in items %}
-    <tr>
-        <td>{{ row.summary_date }}</td>
-        <td>{{ row.total_surveys }}</td>
-        <td>${{ "%.2f"|format(row.total_survey_cost) }}</td>
-        <td>{{ row.top_species or "-" }}</td>
-        <td>{{ row.low_equipment_alerts or "-" }}</td>
-    </tr>
-    {% else %}
-    <tr><td colspan="5">No summaries yet.</td></tr>
-    {% endfor %}
-</table>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Total Surveys</th>
+                    <th>Total Cost</th>
+                    <th>Most Observed Species</th>
+                    <th>Low Equipment Alerts</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in items %}
+                <tr>
+                    <td>{{ row.summary_date }}</td>
+                    <td>{{ row.total_surveys }}</td>
+                    <td>${{ "%.2f"|format(row.total_survey_cost) }}</td>
+                    <td>{{ row.top_species or "-" }}</td>
+                    <td>{{ row.low_equipment_alerts or "-" }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted">No summaries yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

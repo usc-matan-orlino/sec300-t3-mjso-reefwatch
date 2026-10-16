@@ -1,33 +1,41 @@
 {% extends "base.html" %}
 {% block title %}Surveys - ReefWatch{% endblock %}
 {% block content %}
-<div class="page-header">
-    <h1>Surveys</h1>
-    <a class="button" href="{{ url_for('new_survey') }}">Add</a>
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="mb-0">Surveys</h1>
+    <a class="btn btn-primary" href="{{ url_for('new_survey') }}">Add</a>
 </div>
 
-<table>
-    <tr>
-        <th>Date</th>
-        <th>Researcher</th>
-        <th>Species Observed</th>
-        <th>Equipment Used</th>
-        <th>Cost</th>
-    </tr>
-    {% for survey in items %}
-    <tr>
-        <td>{{ survey.survey_date }}</td>
-        <td>{{ survey.researcher.name }} ({{ survey.researcher.email }})</td>
-        <td>{{ survey.species_observed | join(", ") }}</td>
-        <td>
-            {% for used in survey.equipment_used %}
-                {{ used.name }} x{{ used.quantity }}{% if not loop.last %}, {% endif %}
-            {% endfor %}
-        </td>
-        <td>${{ "%.2f"|format(survey.survey_cost) }}</td>
-    </tr>
-    {% else %}
-    <tr><td colspan="5">No surveys yet.</td></tr>
-    {% endfor %}
-</table>
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Researcher</th>
+                    <th>Species Observed</th>
+                    <th>Equipment Used</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for survey in items %}
+                <tr>
+                    <td>{{ survey.survey_date }}</td>
+                    <td>{{ survey.researcher.name }} ({{ survey.researcher.email }})</td>
+                    <td>{{ survey.species_observed | join(", ") }}</td>
+                    <td>
+                        {% for used in survey.equipment_used %}
+                            {{ used.name }} x{{ used.quantity }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>${{ "%.2f"|format(survey.survey_cost) }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center text-muted">No surveys yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

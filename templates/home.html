@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Home - ReefWatch{% endblock %}
 {% block content %}
-<h1>ReefWatch Monitoring Station</h1>
-<p>Manage surveys, equipment, partner organisations and daily summaries.</p>
+<div class="p-5 bg-white border rounded-3 shadow-sm">
+    <h1 class="display-6">ReefWatch Monitoring Station</h1>
+    <p class="lead text-muted">Manage surveys, equipment, partner organisations and daily summaries.</p>
+    <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Open Dashboard</a>
+    <a class="btn btn-outline-primary" href="{{ url_for('new_survey') }}">New Survey</a>
+</div>
 {% endblock %}

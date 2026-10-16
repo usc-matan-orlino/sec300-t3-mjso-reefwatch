@@ -1,6 +1,54 @@
 {% extends "base.html" %}
 {% block title %}Dashboard - ReefWatch{% endblock %}
 {% block content %}
-<h1>Dashboard</h1>
-<p>Survey trend charts go here.</p>
+<h1 class="mb-4">Dashboard</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="tile-value">{{ today_surveys }}</div>
+                <div class="text-muted">Total Surveys Today</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="tile-value">{{ today_cost_text }}</div>
+                <div class="text-muted">Survey Cost Today</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header">Surveys per Week</div>
+            <div class="card-body"><canvas id="weekSurveysChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header">Survey Cost per Week ($)</div>
+            <div class="card-body"><canvas id="weekCostChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+    // Draw a bar chart in the canvas with the given id.
+    function barChart(id, labels, data, label) {
+        new Chart(document.getElementById(id), {
+            type: "bar",
+            data: { labels: labels, datasets: [{ label: label, data: data, backgroundColor: "#0b5c7a" }] },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    barChart("weekSurveysChart", {{ week_labels | tojson }}, {{ week_survey_counts | tojson }}, "Surveys");
+    barChart("weekCostChart", {{ week_labels | tojson }}, {{ week_costs | tojson }}, "Cost ($)");
+</script>
 {% endblock %}
