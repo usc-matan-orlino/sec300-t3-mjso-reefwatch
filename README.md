@@ -13,3 +13,8 @@ ReefWatch is a fictional marine conservation organisation created for SEC300 ass
     python app.py
     ```
 
+## Environment File
+Set the time when you would like to aggregate the daily summary. By default it is set to 17:00
+```
+SUMMARY_TIME=17:00
+```
