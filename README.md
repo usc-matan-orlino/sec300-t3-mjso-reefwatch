@@ -18,3 +18,9 @@ Set the time when you would like to aggregate the daily summary. By default it i
 ```
 SUMMARY_TIME=17:00
 ```
+
+## Running the unit tests
+
+```
+python -m unittest discover -v
+```
